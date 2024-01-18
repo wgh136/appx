@@ -21,6 +21,7 @@ class Appx{
   static GlobalKey<NavigatorState>? _navigatorKey;
 
   static GlobalKey<NavigatorState> createKey(){
+    if(_navigatorKey != null) return _navigatorKey!;
     _navigatorKey = GlobalKey<NavigatorState>();
     return _navigatorKey!;
   }
