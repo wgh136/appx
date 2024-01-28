@@ -72,6 +72,8 @@ abstract class StateController{
   void dispose(){
     _controllers.removeWhere((element) => element.controller == this);
   }
+
+  void initState(){}
 }
 
 class _StateControllerWrapped{
@@ -135,6 +137,7 @@ class _StateBuilderState<T extends StateController> extends State<StateBuilder> 
       }
     }));
     widget.initStateWrapped(controller);
+    controller.initState();
     super.initState();
   }
 
