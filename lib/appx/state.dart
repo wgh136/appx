@@ -186,7 +186,6 @@ abstract class ControllerWithWidgetBuilder extends StateController{
 
   bool get maintainState => false;
 
-  @protected
   Widget get widget => Builder(builder: (context) {
     StateController.put(this, tag: tag, autoRemove: !maintainState);
     return StateBuilder(builder: (controller) => buildContent(context));
