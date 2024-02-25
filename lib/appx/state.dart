@@ -122,7 +122,9 @@ class _StateBuilderState<T extends StateController> extends State<StateBuilder> 
 
   @override
   void initState() {
-    if(widget.init != null) {
+    if(widget.init != null
+        && (widget.tag == null
+            || StateController.findOrNull<T>(tag: widget.tag) == null)) {
       StateController.put(widget.init!, tag: widget.tag, autoRemove: true);
     }
     try {
@@ -155,9 +157,6 @@ class _StateBuilderState<T extends StateController> extends State<StateBuilder> 
 abstract class StateWithController<T extends StatefulWidget> extends State<T>{
   late final SimpleController _controller;
 
-  /// If true, the controller will not be disposed when the widget is disposed
-  bool get maintainState => false;
-
   @override
   @mustCallSuper
   void initState() {
@@ -168,9 +167,6 @@ abstract class StateWithController<T extends StatefulWidget> extends State<T>{
   @override
   @mustCallSuper
   void dispose() {
-    if(!maintainState){
-      _controller.dispose();
-    }
     super.dispose();
   }
 
@@ -179,4 +175,20 @@ abstract class StateWithController<T extends StatefulWidget> extends State<T>{
   }
 
   Object? get tag;
+}
+
+abstract class ControllerWithWidgetBuilder extends StateController{
+  /// The content of the widget
+  Widget buildContent(BuildContext context);
+
+  /// tag for the controller
+  String get tag;
+
+  bool get maintainState => false;
+
+  @protected
+  Widget get widget => Builder(builder: (context) {
+    StateController.put(this, tag: tag, autoRemove: !maintainState);
+    return StateBuilder(builder: (controller) => buildContent(context));
+  });
 }
