@@ -7,6 +7,9 @@ abstract class StateController{
   static final _controllers = <_StateControllerWrapped>[];
 
   static T put<T extends StateController>(T controller, {Object? tag, bool autoRemove = false}){
+    if(findOrNull<T>(tag: tag) != null){
+      return findOrNull<T>(tag: tag)!;
+    }
     _controllers.add(_StateControllerWrapped(controller, autoRemove, tag));
     return controller;
   }
@@ -74,6 +77,11 @@ abstract class StateController{
   }
 
   void initState(){}
+
+  @override
+  String toString() {
+    return runtimeType.toString();
+  }
 }
 
 class _StateControllerWrapped{
@@ -82,6 +90,11 @@ class _StateControllerWrapped{
   Object? tag;
 
   _StateControllerWrapped(this.controller, this.autoRemove, this.tag);
+
+  @override
+  String toString() {
+    return "Controller: $controller, AutoRemove: $autoRemove, Tag: $tag";
+  }
 }
 
 
@@ -122,10 +135,8 @@ class _StateBuilderState<T extends StateController> extends State<StateBuilder> 
 
   @override
   void initState() {
-    if(widget.init != null
-        && (widget.tag == null
-            || StateController.findOrNull<T>(tag: widget.tag) == null)) {
-      StateController.put(widget.init!, tag: widget.tag, autoRemove: true);
+    if(widget.init != null) {
+      StateController.put<T>((widget.init! as T), tag: widget.tag, autoRemove: true);
     }
     try {
       controller = StateController.find<T>(tag: widget.tag);
@@ -182,12 +193,14 @@ abstract class ControllerWithWidgetBuilder extends StateController{
   Widget buildContent(BuildContext context);
 
   /// tag for the controller
-  String get tag;
+  Object get tag;
 
   bool get maintainState => false;
 
   Widget get widget => Builder(builder: (context) {
-    StateController.put(this, tag: tag, autoRemove: !maintainState);
-    return StateBuilder(builder: (controller) => buildContent(context));
+    StateController.put<ControllerWithWidgetBuilder>(this, tag: tag, autoRemove: !maintainState);
+    return StateBuilder(builder: (controller) =>
+        StateController.find<ControllerWithWidgetBuilder>(tag: tag)
+            .buildContent(context), tag: tag,);
   });
 }
