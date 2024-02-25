@@ -155,6 +155,9 @@ class _StateBuilderState<T extends StateController> extends State<StateBuilder> 
 abstract class StateWithController<T extends StatefulWidget> extends State<T>{
   late final SimpleController _controller;
 
+  /// If true, the controller will not be disposed when the widget is disposed
+  bool get maintainState => false;
+
   @override
   @mustCallSuper
   void initState() {
@@ -165,7 +168,9 @@ abstract class StateWithController<T extends StatefulWidget> extends State<T>{
   @override
   @mustCallSuper
   void dispose() {
-    _controller.dispose();
+    if(!maintainState){
+      _controller.dispose();
+    }
     super.dispose();
   }
 
