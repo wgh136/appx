@@ -40,7 +40,7 @@ class Appx{
 
   static off(Widget Function() page) {
     Navigator.of(context!)
-        .pushAndRemoveUntil(AppPageRoute(page), (route) => false);
+        .pushReplacement(AppPageRoute(page));
   }
 
   static offAll(Widget Function() page) {
